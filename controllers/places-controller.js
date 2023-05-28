@@ -1,8 +1,9 @@
+// uuid is a package that generates unique id's
 const { v4: uuidv4 } = require("uuid");
 
 const HttpError = require("../models/http-error");
 
-const DUMMY_PLACES = [
+let DUMMY_PLACES = [
   {
     id: "p1",
     title: "Empire State Building",
@@ -15,33 +16,26 @@ const DUMMY_PLACES = [
 
 const getPlaceById = (req, res, next) => {
   const placeId = req.params.pid;
-  console.log("GET Request in places >>>> :", placeId);
-  // {pid: 'p1'} params is a property of request object
   const place = DUMMY_PLACES.find((p) => {
     return p.id === placeId;
   });
   if (!place) {
     throw new HttpError("Could not find a place for the provided id.", 404);
   }
-
-  //  {place} is a short hand for {place: place}
   res.json({ place });
-  // path is /api/places/ and dynamic segment is :pid
 };
 
-const getPlaceByUserId = (req, res, next) => {
+const getPlacesByUserId = (req, res, next) => {
   const userId = req.params.uid;
-  // {uid: 'u1'} params is a property of request object
-  const place = DUMMY_PLACES.find((p) => {
+  const places = DUMMY_PLACES.filter((p) => {
     return p.creator === userId;
   });
-  if (!place) {
+  if (!places || places.length === 0) {
     return next(
-      new HttpError("Could not find a place for the provided user id.", 404)
+      new HttpError("Could not find places for the provided user id.", 404)
     );
   }
-  res.json({ place });
-  // path is /api/places/user/ and dynamic segment is :uid
+  res.json({ places });
 };
 
 const createPlace = (req, res, next) => {
@@ -54,11 +48,39 @@ const createPlace = (req, res, next) => {
     address,
     creator,
   };
+  // DUMMY_PLACES = [...DUMMY_PLACES, createdPlace]
   DUMMY_PLACES.push(createdPlace);
 
   res.status(201).json({ place: createdPlace });
 };
 
+const updatePlace = (req, res, next) => {
+  const { title, description } = req.body;
+  const placeId = req.params.pid;
+
+  const updatedPlace = { ...DUMMY_PLACES.find((p) => p.id === placeId) };
+  // updatedPlace is a new object that has all the properties of the place with the id that we want to update, spread operator is used to copy all the properties of the place with the id that we want to update
+
+  const placeIndex = DUMMY_PLACES.findIndex((p) => p.id === placeId);
+  // find the index of the place with the id that we want to update
+  updatedPlace.title = title;
+  updatedPlace.description = description;
+
+  DUMMY_PLACES[placeIndex] = updatedPlace;
+  // replace the place with the id that we want to update with the updatedPlace
+
+  res.status(200).json({ place: updatedPlace });
+};
+
+const deletePlace = (req, res, next) => {
+  const placeId = req.params.pid;
+  DUMMY_PLACES = DUMMY_PLACES.filter((p) => p.id !== placeId);
+
+  res.status(200).json({ message: "Deleted place." });
+};
+
 exports.getPlaceById = getPlaceById;
-exports.getPlaceByUserId = getPlaceByUserId;
+exports.getPlacesByUserId = getPlacesByUserId;
 exports.createPlace = createPlace;
+exports.updatePlace = updatePlace;
+exports.deletePlace = deletePlace;
