@@ -13,6 +13,7 @@ app.use(bodyParser.json());
  
 app.use("/api/places", placesRoutes); // => /api/places...
 
+app.use("/api/users", usersRoutes); // => /api/users...
 // 404 Middleware function for unsupported routes (routes that are not defined)
 app.use((req, res, next) => {
   const error = new HttpError("Could not find this route.", 404);

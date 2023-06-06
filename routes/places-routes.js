@@ -1,8 +1,9 @@
-const express = require("express");
+const { Router } = require("express");
+const { check } = require("express-validator");
 
 const placesControllers = require("../controllers/places-controller");
 
-const router = express.Router();
+const router = Router();
 // Router is a middleware function, so we can export it and use it in app.js  as middleware function
 
 //  BASICS OF REST API :
@@ -18,11 +19,22 @@ router.get("/:pid", placesControllers.getPlaceById);
 router.get("/users/:uid", placesControllers.getPlacesByUserId);
 
 //  router.post method is a middleware function that will be executed for incoming POST requests, first argument is the path, second argument is the middleware function that will be executed for incoming requests.
-router.post("/", placesControllers.createPlace);
+router.post(
+  "/",
+  [
+    check("title").not().isEmpty(),
+    check("description").isLength({ min: 5 }),
+    check("address").not().isEmpty(),
+  ],
+  placesControllers.createPlace
+);
 
 // patch request is used to update existing resources
 
-router.patch("/:pid", placesControllers.updatePlace);
+router.patch("/:pid", [
+  check("title").not().isEmpty(),
+  check("description").isLength({ min: 5 }),
+],placesControllers.updatePlace);
 
 router.delete("/:pid", placesControllers.deletePlace);
 
