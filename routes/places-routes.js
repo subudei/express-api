@@ -39,3 +39,11 @@ router.patch("/:pid", [
 router.delete("/:pid", placesControllers.deletePlace);
 
 module.exports = router;
+
+//   Post and Get diference in req object is that post has a body property and get does not have a body property, that means that we can access the body property only on post request, and we can access the query params only on get request. 
+//  Body is the data that we send along with the request, for example: http://localhost:5000/api/places, the data that we send along with the request is the body.
+//   Query params are the params that we add after the ? in the url, for example: http://localhost:5000/api/places/users/u1, u1 is the query param.
+
+//  on Post req we access the body property of the req object, on Get req we access the query property of the req object.
+
+// on Post res we send back a response that contains the data that we want to store on the server, on Get res we send back a response that contains the data that we want to get from the server.
